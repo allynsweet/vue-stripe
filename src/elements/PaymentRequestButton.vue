@@ -93,28 +93,28 @@ export default {
         // re-show the payment interface, or show an error message and close
         // the payment interface.
         e.complete('fail');
-      } else {
-        // Report to the browser that the confirmation was successful, prompting
-        // it to close the browser payment method collection interface.
-        e.complete('success');
-        // Check if the PaymentIntent requires any actions and if so let Stripe.js
-        // handle the flow. If using an API version older than "2019-02-11" instead
-        // instead check for: `paymentIntent.status === "requires_source_action"`.
-        if (paymentIntent.status === 'requires_action') {
-          // Let Stripe.js handle the rest of the payment flow.
-          const { error } = await this.stripe.confirmCardPayment(this.clientSecret);
-          if (error) {
-            // The payment failed -- ask your customer for a new payment method.
-            this.$emit('error', error);
-          } else {
-            // The payment has succeeded.
-            this.$emit('success');
-          }
+        return;
+      }
+      // Report to the browser that the confirmation was successful, prompting
+      // it to close the browser payment method collection interface.
+      e.complete('success');
+      // Check if the PaymentIntent requires any actions and if so let Stripe.js
+      // handle the flow. If using an API version older than "2019-02-11" instead
+      // instead check for: `paymentIntent.status === "requires_source_action"`.
+      if (paymentIntent.status === 'requires_action' || paymentIntent.status === 'requires_source_action') {
+        // Let Stripe.js handle the rest of the payment flow.
+        const { error } = await this.stripe.confirmCardPayment(this.clientSecret);
+        if (error) {
+          // The payment failed -- ask your customer for a new payment method.
+          this.$emit('error', error);
         } else {
           // The payment has succeeded.
           this.$emit('success');
         }
+        return;
       }
+      // The payment has succeeded.
+      this.$emit('success');
     },
   },
 };
