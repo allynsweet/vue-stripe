@@ -4,8 +4,9 @@
 
 <script>
 import { loadStripe } from '@stripe/stripe-js/dist/pure.esm.js';
-import { STRIPE_PARTNER_DETAILS } from '../constants';
+import { ERROR, FAIL, STRIPE_PARTNER_DETAILS, SUCCESS } from '../constants';
 const ELEMENT_TYPE = 'paymentRequestButton';
+
 export default {
   props: {
     pk: {
@@ -92,12 +93,12 @@ export default {
         // Report to the browser that the payment failed, prompting it to
         // re-show the payment interface, or show an error message and close
         // the payment interface.
-        e.complete('fail');
+        e.complete(FAIL);
         return;
       }
       // Report to the browser that the confirmation was successful, prompting
       // it to close the browser payment method collection interface.
-      e.complete('success');
+      e.complete(SUCCESS);
       // Check if the PaymentIntent requires any actions and if so let Stripe.js
       // handle the flow. If using an API version older than "2019-02-11" instead
       // instead check for: `paymentIntent.status === "requires_source_action"`.
@@ -106,15 +107,15 @@ export default {
         const { error } = await this.stripe.confirmCardPayment(this.clientSecret);
         if (error) {
           // The payment failed -- ask your customer for a new payment method.
-          this.$emit('error', error);
-        } else {
-          // The payment has succeeded.
-          this.$emit('success');
+          this.$emit(ERROR, error);
+          return;
         }
+        // The payment has succeeded.
+        this.$emit();
         return;
       }
       // The payment has succeeded.
-      this.$emit('success');
+      this.$emit(SUCCESS);
     },
   },
 };

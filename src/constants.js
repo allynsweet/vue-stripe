@@ -110,3 +110,8 @@ export const STRIPE_PARTNER_DETAILS = {
   url: process.env.VUE_STRIPE_WEBSITE,
   partner_id: process.env.VUE_STRIPE_PARTNER_ID,
 };
+
+// 
+export const SUCCESS = 'success';
+export const FAIL = 'fail'
+export const ERROR = 'error'
